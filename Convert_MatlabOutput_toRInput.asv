@@ -183,7 +183,7 @@ for j=1:number
                 % time between targ_acq and targ_Hold
                 FreqMot_TarHol_to_Sound = repmat(9999,length(nTrials),1); FreqMot_Sound_to_RewardDelivery =repmat(9999,length(nTrials),1); FreqMot_ITI =repmat(9999,length(nTrials),1);
                 FreqMot_FixAcq_to_TarHol= repmat(9999,length(nTrials),1); M2S_ResponseTime = repmat(9999,length(nTrials),1); Freq_RewardDelivery = repmat(9999,length(nTrials),1);
-                FreqMot_TarHol_BeforeRewardDelivery= repmat(9999,length(nTrials),1);
+                FreqMot_TarHol_EndRewardDelivery= repmat(9999,length(nTrials),1);
                 Names= fieldnames(data);
                 if strcmp(Names{end-2},'jaw' )
                     [data.('jaw_R')] = data.('jaw');
@@ -201,7 +201,7 @@ for j=1:number
                     FreqMot_Sound_to_RewardDelivery(indTrial) = NaN;
                     FreqMot_ITI(indTrial)  = NaN;
                     Freq_RewardDelivery(indTrial) = NaN;
-                    FreqMot_TarHol_BeforeRewardDelivery(indTrial) = NaN;
+                    FreqMot_TarHol_EndRewardDelivery(indTrial) = NaN;
                     %differentiate between correct and incorrect trials
                     if data(indTrial).completed == 1 && data(indTrial).success == 0 %complete & error trial
                         M2S_ResponseTime(indTrial)     =[data(indTrial).states_onset(data(indTrial).states == 5) - data(indTrial).states_onset(data(indTrial).states == 4)];
@@ -232,8 +232,8 @@ for j=1:number
                         Mot_RewardDelivery = data(indTrial).jaw_R(Ind_StartRewardDelivery:Ind_RewardDelivery);
                         Freq_RewardDelivery(indTrial) = sum(Mot_RewardDelivery == 0)/ length(Mot_RewardDelivery);
                         %5.
-                        Mot_TarHol_to_BeforeRewardDelivery = data(indTrial).jaw_R(find(data(indTrial).state == 5,1):Ind_StartRewardDelivery-1);
-                        FreqMot_TarHol_BeforeRewardDelivery(indTrial) = sum(Mot_TarHol_to_BeforeRewardDelivery == 0)/ length(Mot_TarHol_to_BeforeRewardDelivery);
+                        Mot_TarHol_to_EndRewardDelivery = data(indTrial).jaw_R(find(data(indTrial).state == 5,1):Ind_RewardDelivery);
+                        FreqMot_TarHol_EndRewardDelivery(indTrial) = sum(Mot_TarHol_to_EndRewardDelivery == 0)/ length(Mot_TarHol_to_EndRewardDelivery);
                         
                         %5.after reward delivery
                         Mot_ITI = data(indTrial).jaw_R(find(data(indTrial).state == 50,1):end);
@@ -280,9 +280,9 @@ for j=1:number
                         Mot_RewardDelivery               = data(indTrial).jaw_R(Ind_StartRewardDelivery:Ind_RewardDelivery);
                         Freq_RewardDelivery(indTrial) = sum(Mot_RewardDelivery == 0)/ length(Mot_RewardDelivery);
                         %5.
-                        Mot_TarHol_to_BeforeRewardDelivery = data(indTrial).jaw_R(find(data(indTrial).state == 5,1):Ind_StartRewardDelivery-1);
-                        FreqMot_TarHol_BeforeRewardDelivery(indTrial) = sum(Mot_TarHol_to_BeforeRewardDelivery == 0)/ length(Mot_TarHol_to_BeforeRewardDelivery);
-                       %5.after reward delivery
+                        Mot_TarHol_to_EndRewardDelivery = data(indTrial).jaw_R(find(data(indTrial).state == 5,1):Ind_RewardDelivery);
+                        FreqMot_TarHol_EndRewardDelivery(indTrial) = sum(Mot_TarHol_to_EndRewardDelivery == 0)/ length(Mot_TarHol_to_EndRewardDelivery);
+                        %5.after reward delivery
                         Mot_ITI               = data(indTrial).jaw_R(find(data(indTrial).state == 50,1):end);
                         FreqMot_ITI(indTrial) = sum(Mot_ITI == 0)/ length(Mot_ITI);
                         
@@ -345,25 +345,25 @@ for j=1:number
                         Tab_Trial = array2table([nTrials; completed; success ; target_selected_Hand; target_selected_Eye; target2_selected_Hand;...
                             target2_selected_Eye; aborted_state; Task_type;Rotation_Sample; Rotation_t1; Rotation_t2; Rot_Diff;...
                             reward_selected; reward_time; rewarded; FreqMot_FixAcq_to_TarHol';HistMot_FixAcq_to_ITI'; FreqMot_TarHol_to_Sound';HistMot_TarHol_to_Sound'; FreqMot_Sound_to_RewardDelivery';...
-                            Freq_RewardDelivery'; FreqMot_ITI';FreqMot_TarHol_BeforeRewardDelivery'; HistMot_ITI';M2S_ResponseTime'; Wagering_ResponseTime]');
+                            Freq_RewardDelivery'; FreqMot_ITI';FreqMot_TarHol_EndRewardDelivery'; HistMot_ITI';M2S_ResponseTime'; Wagering_ResponseTime]');
                         % give the colums a name
                         Tab_Trial.Properties.VariableNames = {getname(nTrials),getname(completed),getname(success),getname(target_selected_Hand),...
                             getname(target_selected_Eye),getname(target2_selected_Hand), getname(target2_selected_Eye),getname(aborted_state) ,getname(Task_type),getname(Rotation_Sample),getname(Rotation_t1),...
                             getname(Rotation_t2),getname(Rot_Diff),getname(reward_selected),getname(reward_time),getname(rewarded),getname(FreqMot_FixAcq_to_TarHol),getname(HistMot_FixAcq_to_ITI),...
                             getname(FreqMot_TarHol_to_Sound), getname(HistMot_TarHol_to_Sound),getname(FreqMot_Sound_to_RewardDelivery),...
-                            getname(Freq_RewardDelivery),getname(FreqMot_ITI),getname(FreqMot_TarHol_BeforeRewardDelivery),getname(HistMot_ITI),getname(M2S_ResponseTime),getname(Wagering_ResponseTime)};
+                            getname(Freq_RewardDelivery),getname(FreqMot_ITI),getname(FreqMot_TarHol_EndRewardDelivery),getname(HistMot_ITI),getname(M2S_ResponseTime),getname(Wagering_ResponseTime)};
                         
                     case 9
                         % create a table
                         Tab_Trial = array2table([nTrials; completed; success ; target_selected_Hand; target_selected_Eye; PosTar_ChoosenOption; aborted_state; Task_type;Rotation_Sample; Rotation_t1; Rotation_t2; Rot_Diff;...
                             FreqMot_FixAcq_to_TarHol';HistMot_FixAcq_to_ITI'; FreqMot_TarHol_to_Sound';HistMot_TarHol_to_Sound'; FreqMot_Sound_to_RewardDelivery';...
-                            Freq_RewardDelivery'; FreqMot_ITI';FreqMot_TarHol_BeforeRewardDelivery';HistMot_ITI';M2S_ResponseTime']');
+                            Freq_RewardDelivery'; FreqMot_ITI';FreqMot_TarHol_EndRewardDelivery';HistMot_ITI';M2S_ResponseTime']');
                         % give the colums a name
                         Tab_Trial.Properties.VariableNames = {getname(nTrials),getname(completed),getname(success),getname(target_selected_Hand),getname(target_selected_Eye),...
                             getname(PosTar_ChoosenOption), getname(aborted_state) ,getname(Task_type),getname(Rotation_Sample),getname(Rotation_t1),...
                             getname(Rotation_t2),getname(Rot_Diff),getname(FreqMot_FixAcq_to_TarHol),getname(HistMot_FixAcq_to_ITI),...
                             getname(FreqMot_TarHol_to_Sound), getname(HistMot_TarHol_to_Sound),getname(FreqMot_Sound_to_RewardDelivery),...
-                            getname(Freq_RewardDelivery),getname(FreqMot_ITI),getname(FreqMot_TarHol_BeforeRewardDelivery),getname(HistMot_ITI),getname(M2S_ResponseTime)};
+                            getname(Freq_RewardDelivery),getname(FreqMot_ITI),getname(FreqMot_TarHol_EndRewardDelivery),getname(HistMot_ITI),getname(M2S_ResponseTime)};
                 end
                 
                 
