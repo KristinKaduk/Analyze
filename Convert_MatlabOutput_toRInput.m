@@ -191,12 +191,8 @@ for j=1:number
                 end
                 
                 %% plot each trial
-                %         sum(TableAllTrials.Variables{:,:} == 1)
-                %          TableAllTrials({'jaw_R','body_R'},:)
-                %          TableAllTrials{1:2,{'jaw_R','body_R'}}
-                %         sum(Jaw_R ~= 0)
                 for indTrial = 1: nTrials(end)
-                    FreqMot_FixAcq_to_TarHol(indTrial) = NaN;  M2S_ResponseTime(indTrial)  = NaN;
+                    FreqMot_FixAcq_to_TarHol(indTrial) = NaN;  M2S_ResponseTime(indTrial)  = NaN;Wagering_ResponseTime(indTrial)  = NaN;
                     FreqMot_TarHol_to_Sound(indTrial) = NaN;
                     FreqMot_Sound_to_RewardDelivery(indTrial) = NaN;
                     FreqMot_ITI(indTrial)  = NaN;
@@ -264,7 +260,7 @@ for j=1:number
                         end
                         %1.Motion in the trial fix-acq (state 5) to beginn ITI (state 50)
                         Mot_FixAcq_to_TarHol = data(indTrial).jaw_R(find(data(indTrial).state == 1,1):find(data(indTrial).state == 5,1));
-                        FreqMot_FixAcq_to_TarHol(indTrial) = sum(Mot_FixAcq_to_TarHol == 1)/ length(Mot_FixAcq_to_TarHol);
+                        FreqMot_FixAcq_to_TarHol(indTrial) = sum(Mot_FixAcq_to_TarHol == 0)/ length(Mot_FixAcq_to_TarHol);
                         %2.tar_hol (state 5) to reward (state 21)
                         %Ind_SoundDisplayed = find(data(insdTrial).tSample_from_time_start == (data(indTrial).tSample_from_time_start(find(data(indTrial).state == 5,1))+ fid.task.timing.tar_time_hold));
                         Mot_TarHol_to_Sound               = data(indTrial).jaw_R(find(data(indTrial).state == 5,1):find(data(indTrial).state == 21,1));
