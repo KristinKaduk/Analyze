@@ -111,7 +111,7 @@ for j=1:number
             fname = [monkeyName(1:3) num2str(year) '-' num2str(months,'%02d') '-' num2str(day,'%02d') '_' num2str(r,'%02d') '.mat'];
             
             if strcmp(monkeyName, 'Test')
-                fname = ['Tst' num2str(y) '-' num2str(months,'%02d') '-' num2str(day,'%02d') '_' num2str(r,'%02d') '.mat'];
+                fname = ['Tst' num2str(year) '-' num2str(months,'%02d') '-' num2str(day,'%02d') '_' num2str(r,'%02d') '.mat'];
                 
             end
             
@@ -167,7 +167,7 @@ for j=1:number
                         
                         if sqrt(((x0 - x))^2 + (y0 - y)^2) < r % check if (x,y) is within radius r centered on (x0,y0)
                             is_within = 1;
-                            %left or right?
+                            %In trials X was the match on the left and the particpant chose left or right?
                             if  x0 < 0 %negativ values are on the left side
                                 PosTar_ChoosenOption(i_Trials) = 1;
                             elseif x0 > 0
@@ -182,7 +182,7 @@ for j=1:number
                 
                 % time between targ_acq and targ_Hold
                 FreqMot_TarHol_to_Sound = repmat(9999,length(nTrials),1); FreqMot_Sound_to_RewardDelivery =repmat(9999,length(nTrials),1); FreqMot_ITI =repmat(9999,length(nTrials),1);
-                FreqMot_FixAcq_to_TarHol= repmat(9999,length(nTrials),1); M2S_ResponseTime = repmat(9999,length(nTrials),1); Freq_RewardDelivery = repmat(9999,length(nTrials),1);
+                FreqMot_FixAcq_to_TarHol= repmat(9999,length(nTrials),1); Wagering_ResponseTime= repmat(9999,length(nTrials),1); M2S_ResponseTime = repmat(9999,length(nTrials),1); Freq_RewardDelivery = repmat(9999,length(nTrials),1);
                 FreqMot_TarHol_BeforeRewardDelivery= repmat(9999,length(nTrials),1);
                 Names= fieldnames(data);
                 if strcmp(Names{end-2},'jaw' )
@@ -201,10 +201,10 @@ for j=1:number
                     %differentiate between correct and incorrect trials
                     if data(indTrial).completed == 1 && data(indTrial).success == 0 %complete & error trial
                         M2S_ResponseTime(indTrial)     =[data(indTrial).states_onset(data(indTrial).states == 5) - data(indTrial).states_onset(data(indTrial).states == 4)];
-                        if Task_type(1) == 10
-                            Wagering_ResponseTime(indTrial)     =[data(indTrial).states_onset(data(indTrial).states == 24) - data(indTrial).states_onset(data(indTrial).states == 23)];
-                            
-                        end
+                         if Task_type(1) == 10
+                             Wagering_ResponseTime(indTrial)     =[data(indTrial).states_onset(data(indTrial).states == 24) - data(indTrial).states_onset(data(indTrial).states == 23)];
+                             
+                         end
                         
                         %1.Motion in the trial fix-acq (state 5) to beginn ITI (state 50)
                         Mot_FixAcq_to_TarHol = data(indTrial).jaw_R(find(data(indTrial).state == 1,1):find(data(indTrial).state == 5,1));
@@ -255,9 +255,9 @@ for j=1:number
                     elseif data(indTrial).completed == 1 && data(indTrial).success == 1
                         M2S_ResponseTime(indTrial)     =[data(indTrial).states_onset(data(indTrial).states == 5) - data(indTrial).states_onset(data(indTrial).states == 4)];
                         %M2S_ReleaseTime(indTrial)      =[data(indTrial).states_onset(data(indTrial).states == 5) - data(indTrial).states_onset(data(indTrial).states == 4)];
-                        if Task_type(1) == 10
-                            Wagering_ResponseTime(indTrial)     =[data(indTrial).states_onset(data(indTrial).states == 24) - data(indTrial).states_onset(data(indTrial).states == 23)];
-                        end
+                         if Task_type(1) == 10
+                             Wagering_ResponseTime(indTrial)     =[data(indTrial).states_onset(data(indTrial).states == 24) - data(indTrial).states_onset(data(indTrial).states == 23)];
+                         end
                         %1.Motion in the trial fix-acq (state 5) to beginn ITI (state 50)
                         Mot_FixAcq_to_TarHol = data(indTrial).jaw_R(find(data(indTrial).state == 1,1):find(data(indTrial).state == 5,1));
                         FreqMot_FixAcq_to_TarHol(indTrial) = sum(Mot_FixAcq_to_TarHol == 0)/ length(Mot_FixAcq_to_TarHol);
@@ -335,16 +335,16 @@ for j=1:number
                 T.abort_code =        T.abort_code' ;
                 Abort_code = struct2table(T);
                 %%
-                switch  Task_type(1)
+                 switch  Task_type(1)
                     case 10
                         
-                        Tab_Trial = array2table([nTrials; completed; success ; target_selected_Hand; target_selected_Eye; target2_selected_Hand;...
+                        Tab_Trial = array2table([nTrials; completed; success ; target_selected_Hand; target_selected_Eye; PosTar_ChoosenOption; target2_selected_Hand;...
                             target2_selected_Eye; aborted_state; Task_type;Rotation_Sample; Rotation_t1; Rotation_t2; Rot_Diff;...
                             reward_selected; reward_time; rewarded; FreqMot_FixAcq_to_TarHol';HistMot_FixAcq_to_ITI'; FreqMot_TarHol_to_Sound';HistMot_TarHol_to_Sound'; FreqMot_Sound_to_RewardDelivery';...
-                            Freq_RewardDelivery'; FreqMot_ITI';FreqMot_TarHol_BeforeRewardDelivery'; HistMot_ITI';M2S_ResponseTime'; Wagering_ResponseTime]');
+                            Freq_RewardDelivery'; FreqMot_ITI';FreqMot_TarHol_BeforeRewardDelivery'; HistMot_ITI';M2S_ResponseTime'; Wagering_ResponseTime']');
                         % give the colums a name
                         Tab_Trial.Properties.VariableNames = {getname(nTrials),getname(completed),getname(success),getname(target_selected_Hand),...
-                            getname(target_selected_Eye),getname(target2_selected_Hand), getname(target2_selected_Eye),getname(aborted_state) ,getname(Task_type),getname(Rotation_Sample),getname(Rotation_t1),...
+                            getname(target_selected_Eye),  getname(PosTar_ChoosenOption),getname(target2_selected_Hand), getname(target2_selected_Eye),getname(aborted_state) ,getname(Task_type),getname(Rotation_Sample),getname(Rotation_t1),...
                             getname(Rotation_t2),getname(Rot_Diff),getname(reward_selected),getname(reward_time),getname(rewarded),getname(FreqMot_FixAcq_to_TarHol),getname(HistMot_FixAcq_to_ITI),...
                             getname(FreqMot_TarHol_to_Sound), getname(HistMot_TarHol_to_Sound),getname(FreqMot_Sound_to_RewardDelivery),...
                             getname(Freq_RewardDelivery),getname(FreqMot_ITI),getname(FreqMot_TarHol_BeforeRewardDelivery),getname(HistMot_ITI),getname(M2S_ResponseTime),getname(Wagering_ResponseTime)};
@@ -360,7 +360,7 @@ for j=1:number
                             getname(Rotation_t2),getname(Rot_Diff),getname(FreqMot_FixAcq_to_TarHol),getname(HistMot_FixAcq_to_ITI),...
                             getname(FreqMot_TarHol_to_Sound), getname(HistMot_TarHol_to_Sound),getname(FreqMot_Sound_to_RewardDelivery),...
                             getname(Freq_RewardDelivery),getname(FreqMot_ITI),getname(FreqMot_TarHol_BeforeRewardDelivery),getname(HistMot_ITI),getname(M2S_ResponseTime)};
-                end
+                 end
                 
                 
                 
@@ -422,7 +422,7 @@ for j=1:number
     
     
 end
-writetable(Data,['Y:\Projects\Wagering_monkey\Results\' monkeyName, '\',Monkey,  'M2S_psychophysicTask_since' ,starting_folder,'_until_', ending_folder,'.txt'], 'Delimiter', ',')
+writetable(Data,['Y:\Projects\Wagering_monkey\Data\VariablesInTableForR\' monkeyName, '\',Monkey,  'M2S_psychophysicTask_since' ,starting_folder,'_until_', ending_folder,'.txt'], 'Delimiter', ',')
 writetable(Data,['C:\Users\kkaduk\Dropbox\promotion\Projects\Wagering_Monkey\Results\' Monkey, '\',Monkey,  'M2S_psychophysicTask_since' ,starting_folder,'_until_', ending_folder,'.txt'], 'Delimiter', ',')
 disp(['saved  C:\Users\kkaduk\Dropbox\promotion\Projects\Wagering_Monkey\Results\' monkeyName, '\',Monkey,  'M2S_psychophysicTask_since' ,starting_folder,'_until_', ending_folder,'.txt'])
 end
