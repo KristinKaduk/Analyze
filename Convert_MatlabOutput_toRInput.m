@@ -148,6 +148,7 @@ for j=1:number
                 %  acquisition period
                 
                 PosTar_ChoosenOption = nan(1,length(data));
+                PosTa2_ChoosenOption = nan(1,length(data));
                 for i_Trials = find([data.completed]== 1)
                     x_hnd = [data(i_Trials).x_hnd]';                  y_hnd = [data(i_Trials).y_hnd]';
                     StatesPerTrial = [data(i_Trials).state]';
@@ -155,8 +156,32 @@ for j=1:number
                     x= x_hnd(IndStateTarAcq(end));
                     y= y_hnd(IndStateTarAcq(end));
                     
+                    %
+                    IndStateTa2Acq = find(StatesPerTrial == 25 ); % state == 4 tar_acq
+                    x_ta2= x_hnd(IndStateTa2Acq(end));
+                    y_ta2= y_hnd(IndStateTa2Acq(end));
+                    
                     % x,y coordinate of the targets
                     % Which target has been touched? - left or right?
+                    
+                    for i_NrTa2 = 1: length(data(i_Trials).task.hnd.ta2) %target 1 is the match
+                        x0_ta2=[data(i_Trials).task.hnd.ta2(i_NrTa2).x];
+                        y0_ta2=[data(i_Trials).task.hnd.ta2(i_NrTa2).y];
+                        r_ta2 = [data(i_Trials).task.hnd.ta2(i_NrTa2).radius];
+                        
+                        is_within = 0;
+                        
+                        if sqrt(((x0_ta2 - x_ta2))^2 + (y0_ta2 - y_ta2)^2) < r_ta2 % check if (x,y) is within radius r centered on (x0,y0)
+                            is_within = 1;
+                            %In trials X was the match on the left and the particpant chose left or right?
+                            if  x0_ta2 < 0 %negativ values are on the left side
+                                PosTa2_ChoosenOption(i_Trials) = 1;
+                            elseif x0_ta2 > 0
+                                PosTa2_ChoosenOption(i_Trials) = 2;
+                            end
+                        end
+                        
+                    end
                     
                     for i_NrTar = 1: length(data(i_Trials).task.hnd.tar) %target 1 is the match
                         x0=[data(i_Trials).task.hnd.tar(i_NrTar).x];
@@ -338,13 +363,13 @@ for j=1:number
                  switch  Task_type(1)
                     case 10
                         
-                        Tab_Trial = array2table([nTrials; completed; success ; target_selected_Hand; target_selected_Eye; PosTar_ChoosenOption; target2_selected_Hand;...
+                        Tab_Trial = array2table([nTrials; completed; success ; target_selected_Hand; target_selected_Eye; PosTar_ChoosenOption; PosTa2_ChoosenOption; target2_selected_Hand;...
                             target2_selected_Eye; aborted_state; Task_type;Rotation_Sample; Rotation_t1; Rotation_t2; Rot_Diff;...
                             reward_selected; reward_time; rewarded; FreqMot_FixAcq_to_TarHol';HistMot_FixAcq_to_ITI'; FreqMot_TarHol_to_Sound';HistMot_TarHol_to_Sound'; FreqMot_Sound_to_RewardDelivery';...
                             Freq_RewardDelivery'; FreqMot_ITI';FreqMot_TarHol_BeforeRewardDelivery'; HistMot_ITI';M2S_ResponseTime'; Wagering_ResponseTime']');
                         % give the colums a name
                         Tab_Trial.Properties.VariableNames = {getname(nTrials),getname(completed),getname(success),getname(target_selected_Hand),...
-                            getname(target_selected_Eye),  getname(PosTar_ChoosenOption),getname(target2_selected_Hand), getname(target2_selected_Eye),getname(aborted_state) ,getname(Task_type),getname(Rotation_Sample),getname(Rotation_t1),...
+                            getname(target_selected_Eye),  getname(PosTar_ChoosenOption),  getname(PosTa2_ChoosenOption), getname(target2_selected_Hand), getname(target2_selected_Eye),getname(aborted_state) ,getname(Task_type),getname(Rotation_Sample),getname(Rotation_t1),...
                             getname(Rotation_t2),getname(Rot_Diff),getname(reward_selected),getname(reward_time),getname(rewarded),getname(FreqMot_FixAcq_to_TarHol),getname(HistMot_FixAcq_to_ITI),...
                             getname(FreqMot_TarHol_to_Sound), getname(HistMot_TarHol_to_Sound),getname(FreqMot_Sound_to_RewardDelivery),...
                             getname(Freq_RewardDelivery),getname(FreqMot_ITI),getname(FreqMot_TarHol_BeforeRewardDelivery),getname(HistMot_ITI),getname(M2S_ResponseTime),getname(Wagering_ResponseTime)};
@@ -356,7 +381,7 @@ for j=1:number
                             Freq_RewardDelivery'; FreqMot_ITI';FreqMot_TarHol_BeforeRewardDelivery';HistMot_ITI';M2S_ResponseTime']');
                         % give the colums a name
                         Tab_Trial.Properties.VariableNames = {getname(nTrials),getname(completed),getname(success),getname(target_selected_Hand),getname(target_selected_Eye),...
-                            getname(PosTar_ChoosenOption), getname(aborted_state) ,getname(Task_type),getname(Rotation_Sample),getname(Rotation_t1),...
+                            getname(PosTar_ChoosenOption),  getname(aborted_state) ,getname(Task_type),getname(Rotation_Sample),getname(Rotation_t1),...
                             getname(Rotation_t2),getname(Rot_Diff),getname(FreqMot_FixAcq_to_TarHol),getname(HistMot_FixAcq_to_ITI),...
                             getname(FreqMot_TarHol_to_Sound), getname(HistMot_TarHol_to_Sound),getname(FreqMot_Sound_to_RewardDelivery),...
                             getname(Freq_RewardDelivery),getname(FreqMot_ITI),getname(FreqMot_TarHol_BeforeRewardDelivery),getname(HistMot_ITI),getname(M2S_ResponseTime)};
@@ -411,20 +436,23 @@ for j=1:number
                 DataOneFile = [T, Tab_Trial];
                 Data = [ DataOneFile;Data];
                 
-            end %TaskType
-            
-            
-            
-            
-            
+            end %TaskType  
         end
     end
     
     
 end
-writetable(Data,['Y:\Projects\Wagering_monkey\Data\VariablesInTableForR\' monkeyName, '\',Monkey,  'M2S_psychophysicTask_since' ,starting_folder,'_until_', ending_folder,'.txt'], 'Delimiter', ',')
-writetable(Data,['C:\Users\kkaduk\Dropbox\promotion\Projects\Wagering_Monkey\Results\' Monkey, '\',Monkey,  'M2S_psychophysicTask_since' ,starting_folder,'_until_', ending_folder,'.txt'], 'Delimiter', ',')
-disp(['saved  C:\Users\kkaduk\Dropbox\promotion\Projects\Wagering_Monkey\Results\' monkeyName, '\',Monkey,  'M2S_psychophysicTask_since' ,starting_folder,'_until_', ending_folder,'.txt'])
+save(['Y:\Projects\Wagering_monkey\Data\VariablesInTableForR\' monkeyName, '\',Monkey,  'M2S_Wagering_since' ,starting_folder,'_until_', ending_folder] ,'Data');
+writetable(Data,['Y:\Projects\Wagering_monkey\Data\VariablesInTableForR\' monkeyName, '\',Monkey,  'M2S_Wagering_since' ,starting_folder,'_until_', ending_folder,'.txt'], 'Delimiter', ',')
+writetable(Data,['C:\Users\kkaduk\Dropbox\promotion\Projects\Wagering_Monkey\Data\' Monkey, '\',Monkey,  'M2S_Wagering_since' ,starting_folder,'_until_', ending_folder,'.txt'], 'Delimiter', ',')
+disp(['saved  C:\Users\kkaduk\Dropbox\promotion\Projects\Wagering_Monkey\Data\' monkeyName, '\',Monkey,  'M2S_Wagering_since' ,starting_folder,'_until_', ending_folder,'.txt'])
+
+%% Variables per Session - compute & save as table 
+path_Data = 'Y:\Projects\Wagering_monkey\Data\VariablesInTableForR';
+path_save = 'Y:\Projects\Wagering_monkey\Data\VariablesInTableForR'; 
+
+ComputeVariablesPerSession_M2S_Wagering(path_Data, path_save, starting_folder, ending_folder, monkeyName)
+
 end
 
 
