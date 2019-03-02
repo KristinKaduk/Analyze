@@ -1,5 +1,5 @@
 function ComputeVariablesPerSession_M2S_Wagering(path_Data, path_save, dateStart, dateEnd, monkey)
-
+% ComputeVariablesPerSession_M2S_Wagering
 % INPUT
 % path_Data = 'Y:\Projects\Wagering_monkey\Data\VariablesInTableForR'; 
 % path_save = 'Y:\Projects\Wagering_monkey\Data\VariablesInTableForR'; 
@@ -67,8 +67,7 @@ out = metaD_PerSubject(n_wagers, repmat(0,1,length( DiffTable.success)), DiffTab
 TDiff(iDiff).Monkey     = monkey(1:3);    
 TDiff(iDiff).Date       = DifferentDates(iDate);
 TDiff(iDiff).DifficultyLevel= Diff(iDiff);
-if out.da ==Inf
-
+if out.da ==Inf || out.da == -Inf 
 TDiff(iDiff).d                =  NaN; 
 TDiff(iDiff) .metaD           = NaN;  
 TDiff(iDiff).metaEfficiency   = NaN; 

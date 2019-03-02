@@ -1,6 +1,6 @@
 function [dailyStats] = evaluateTrainingData4d_Cornelius(monkeyName,dataDir,starting_folder,ending_folder)
 % example:
-% evaluateTrainingData4d_Cornelius('Cornelius','D:\Data','20180319','20180319')
+% evaluateTrainingData4d_Cornelius('Cornelius','Y:\Data','20190228','20190228')
 
 % Calculate daily performance and print to terminal.
 %   2012-04-04: changed to read .mat files for the latest version of the "monkeypsych_reach"
@@ -123,6 +123,7 @@ for i = 1:nDays
         fname = [monkeyName(1:3) num2str(y) '-' num2str(m,'%02d') '-' num2str(d,'%02d') '_' num2str(r,'%02d') '.mat'];
 
         fid=load([dataDir fname]);
+        if fid.task.type == 2 && all(~fid.trial(1).task.reward.time_neutral == [0 0])
         data=fid.trial;
 
             aborted_state=[data.aborted_state];
@@ -135,7 +136,7 @@ for i = 1:nDays
            
             nInitiated(r)=sum(aborted_abs);
 %         end
-
+        end
     end
     % dailyStats: (day x [year month day nTrials hitRate])
     dailyStats(i,:) = [y m d sum(nTrials) sum(nInitiated) sum(nHits) round(sum(nHits)/sum(nTrials)*100) round(sum(nHits)/sum(nInitiated)*100)];
