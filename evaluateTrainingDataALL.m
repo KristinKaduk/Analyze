@@ -1,6 +1,6 @@
 function [dailyStats] = evaluateTrainingDataALL(monkeyName,dataDirIn)
 % monkeyName='Norman';
-% dataDirIn='Y:\Data\Norman\20190409';
+% dataDirIn='Y:\Data\Norman\20190426';
 % Calculate daily performance and print to terminal.
 %   2012-04-04: changed to read .mat files for the latest version of the "monkeypsych_reach"
 %               output: [Date trials IT hits percent_of_all_trials
